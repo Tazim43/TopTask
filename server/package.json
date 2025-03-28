@@ -1,0 +1,25 @@
+{
+  "name": "totask-backend",
+  "version": "1.0.0",
+  "description": "Priority based todo list. Boosts productivity",
+  "keywords": [],
+  "license": "ISC",
+  "author": "Md. Tazim Uddin",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon --ext ts --exec node --loader ts-node/esm src/index.ts",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.1",
+    "@types/node": "^22.13.14",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.2"
+  }
+}
