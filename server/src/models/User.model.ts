@@ -8,7 +8,11 @@ interface IUser extends Document {
   fullName?: string;
 }
 
-type UserModel = Model<IUser>;
+interface IUserMethods {
+  isPasswordValid(password: string): Promise<boolean>;
+}
+
+type UserModel = Model<IUser, {}, IUserMethods>;
 
 const userSchema: Schema = new Schema<IUser, UserModel>(
   {
@@ -33,11 +37,12 @@ const userSchema: Schema = new Schema<IUser, UserModel>(
   }
 );
 
-userSchema.pre("save", async function (next) {
+userSchema.pre<IUser>("save", async function (next) {
   if (this.isModified("password")) {
     try {
       const salt = await bcrypt.genSalt(10);
       this.password = await bcrypt.hash(this.password as string, salt);
+      next();
     } catch (error: unknown) {
       return next(error as mongoose.CallbackError);
     }
@@ -56,6 +61,8 @@ userSchema.methods.isPasswordValid = async function (
   }
 };
 
-const User = mongoose.model<IUser>("User", userSchema);
+const User = mongoose.model<IUser, UserModel>("User", userSchema);
 
 export default User;
+export { IUser, UserModel };
+export type { IUserMethods };
