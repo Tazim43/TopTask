@@ -5,8 +5,13 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "baseUrl": "./",
+    "paths": {
+      "@types/*": ["src/types/*"]
+    },
+    "typeRoots": ["./src/types", "./node_modules/@types"] // Load custom and default types
   },
-  "include": ["./src/**/*.ts"],
+  "include": ["./src/**/*.ts", "./src/types/**/*.d.ts"],
   "exclude": ["./node_modules", "./dist"]
 }
