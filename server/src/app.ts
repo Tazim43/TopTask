@@ -16,8 +16,10 @@ app.use(express.urlencoded({ limit: MAX_REQUEST_LIMIT, extended: true }));
 
 // app routes
 import userRouter from "./routes/User.router";
+import todoRouter from "./routes/Todo.router";
 
 app.use("/api/v1/auth/", userRouter);
+app.use("/api/v1/todos/", todoRouter);
 
 app.get("/", (req, res) => {
   res.json({
