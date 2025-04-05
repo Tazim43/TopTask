@@ -1,4 +1,4 @@
-import mongoose, { Document, Model, Schema } from "mongoose";
+import mongoose, { Document, Model, Schema, Types } from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -9,6 +9,7 @@ interface IUser extends Document {
   fullName?: string;
   accessToken?: string | null;
   refreshToken?: string | null;
+  todos: Types.ObjectId[];
 }
 
 interface IUserMethods {
@@ -49,6 +50,12 @@ const userSchema: Schema = new Schema<IUser, UserModel>(
       type: String,
       default: null,
     },
+    todos: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Todo", // Reference to the Todo model
+      },
+    ],
   },
   {
     timestamps: true,
