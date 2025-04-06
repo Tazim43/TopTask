@@ -40,10 +40,9 @@ const authenticate = async (
     let decoded;
 
     try {
-      // Verify and decode the token
       decoded = jwt.verify(token, JWT_SECRET);
     } catch (error) {
-      throw new ApiError(StatusCodes.UNAUTHORIZED, "Invalid token");
+      throw new ApiError(StatusCodes.UNAUTHORIZED, "Invalid token", error);
     }
 
     // Ensure decoded token contains user ID

@@ -1,4 +1,4 @@
-import { authenticate } from "src/middlewares/Auth.middleware";
+import { authenticate } from "../middlewares/Auth.middleware";
 import {
   createTask,
   getTodayTasks,

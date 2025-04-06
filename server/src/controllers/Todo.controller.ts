@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import Todo from "../models/Todo.model";
-import User from "src/models/User.model";
+import User from "../models/User.model";
 import { ResponseHandler } from "../utils/responseHandler";
 import ApiError from "../utils/apiError";
 import { asyncHandler } from "../utils/asyncHandler";
 import {
   todoValidationSchema,
   TodoValidationType,
-} from "src/zod/todoValidation";
+} from "../zod/todoValidation";
 
 /**
  * Handles the creation of a new task (Todo) for an authenticated user.
@@ -101,7 +101,7 @@ const getTodayTasks = asyncHandler(async (req: Request, res: Response) => {
       .populate({
         path: "todos",
         match: {
-          createdAt: { $gte: startOfToday, $lte: endOfToday },
+          dueDate: { $gte: startOfToday, $lte: endOfToday },
           completed: false,
         },
       })
@@ -236,15 +236,16 @@ const getUpcommingTasks = asyncHandler(async (req: Request, res: Response) => {
   try {
     // Get upcoming tasks
     const today = new Date();
-    const startOfToday = new Date(today.setHours(0, 0, 0, 0));
+    const endOfToday = new Date(today);
+    endOfToday.setHours(23, 59, 59, 999);
 
     // Find all todos for the user that are not completed and have a due date before today
     const todos = await User.findById(user.id)
       .populate({
         path: "todos",
         match: {
-          dueDate: { $lt: startOfToday },
-          isCompleted: false,
+          dueDate: { $gte: endOfToday },
+          completed: false,
         },
       })
       .select("todos")
@@ -288,14 +289,17 @@ const getOverdueTasks = asyncHandler(async (req: Request, res: Response) => {
     const today = new Date();
     const startOfToday = new Date(today.setHours(0, 0, 0, 0));
 
-    const userModel = await User.findById(user.id).populate("todos");
-    if (!userModel) {
-      throw new ApiError(StatusCodes.UNAUTHORIZED, "User not found");
-    }
+    const todos = await User.findById(user.id).populate({
+      path: "todos",
+      match: {
+        dueDate: { $lt: startOfToday },
+        completed: false,
+      },
+    });
 
-    const todos = userModel.todos.filter(
-      (todo: any) => todo.dueDate < startOfToday && !todo.completed
-    );
+    if (!todos) {
+      throw new ApiError(StatusCodes.NOT_FOUND, "No overdue tasks found");
+    }
 
     ResponseHandler.success(res, todos);
   } catch (error) {
