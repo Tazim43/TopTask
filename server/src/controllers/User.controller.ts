@@ -38,12 +38,7 @@ const userLogin = asyncHandler(async (req: Request, res: Response) => {
   }
 
   // Attempt to find the user by email in the database
-  const user = (await User.findOne({ username })) as {
-    _id: string;
-    isPasswordValid: (password: string) => Promise<boolean>;
-    email: string;
-    username: string;
-  };
+  const user = await User.findOne({ username });
 
   // If user is not found, throw an error
   if (!user) throw new ApiError(StatusCodes.NOT_FOUND, "user not found");
@@ -57,9 +52,11 @@ const userLogin = asyncHandler(async (req: Request, res: Response) => {
   }
 
   // Generate a JWT token with 1-hour expiration
-  const token: string = jwt.sign({ id: user._id }, JWT_SECRET, {
-    expiresIn: "1h",
-  });
+  const accessToken: string = user.generateAccessToken();
+  const refreshToken: string = user.generateRefreshToken();
+  user.accessToken = accessToken;
+  user.refreshToken = refreshToken;
+  await user.save();
 
   // Prepare user info to be sent in the response
   const userInfo = {
@@ -68,8 +65,8 @@ const userLogin = asyncHandler(async (req: Request, res: Response) => {
     name: user.username,
   };
 
-  // Respond with success, including user info and token
-  ResponseHandler.success(res, { userInfo, token });
+  await (user as any).save();
+  ResponseHandler.success(res, { user: userInfo, accessToken, refreshToken });
 });
 
 /**
