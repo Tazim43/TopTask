@@ -96,13 +96,9 @@ userSchema.methods.generateAccessToken = function (): string {
 };
 
 userSchema.methods.generateRefreshToken = function (): string {
-  const token = jwt.sign(
-    { id: this._id },
-    process.env.JWT_REFRESH_SECRET as string,
-    {
-      expiresIn: "7d",
-    }
-  );
+  const token = jwt.sign({ id: this._id }, process.env.JWT_SECRET as string, {
+    expiresIn: "7d",
+  });
   this.refreshToken = token;
 
   return this.refreshToken as string;
