@@ -23,7 +23,10 @@ const userLogin = asyncHandler(async (req: Request, res: Response) => {
 
   // Ensure JWT_SECRET is defined
   if (!JWT_SECRET) {
-    throw new Error("JWT_SECRET is not defined in environment variables");
+    throw new ApiError(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      "JWT Secret not found!"
+    );
   }
 
   // Extract email and password from request body
@@ -65,8 +68,13 @@ const userLogin = asyncHandler(async (req: Request, res: Response) => {
     name: user.username,
   };
 
-  await (user as any).save();
-  ResponseHandler.success(res, { user: userInfo, accessToken, refreshToken });
+  await user.save();
+  ResponseHandler.success(
+    res,
+    { user: userInfo, accessToken, refreshToken },
+    ReasonPhrases.OK,
+    StatusCodes.OK
+  );
 });
 
 /**
@@ -82,7 +90,7 @@ const userSignUp = asyncHandler(async (req: Request, res: Response) => {
   // Check if all required fields are provided
   if (!username || !email || !password) {
     throw new ApiError(
-      StatusCodes.NOT_FOUND,
+      StatusCodes.BAD_REQUEST,
       "Username, Email and password are required"
     );
   }
@@ -130,7 +138,12 @@ const userSignUp = asyncHandler(async (req: Request, res: Response) => {
   };
 
   // Respond with success, including the created user info
-  ResponseHandler.success(res, { user: userInfo });
+  ResponseHandler.success(
+    res,
+    { user: userInfo },
+    ReasonPhrases.CREATED,
+    StatusCodes.CREATED
+  );
 });
 
 /**
