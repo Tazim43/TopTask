@@ -35,8 +35,22 @@ const userLogin = asyncHandler(async (req: Request, res: Response) => {
   // Check if email and password are provided
   if (!username || !password) {
     throw new ApiError(
-      StatusCodes.NOT_FOUND,
-      "Email and password are requried"
+      StatusCodes.BAD_REQUEST,
+      "Username and password are requried"
+    );
+  }
+
+  // Validate only the username and password fields using the userValidationSchema
+  const validationResult = userValidationSchema
+    .pick({ username: true, password: true })
+    .safeParse(req.body);
+
+  // If validation fails, throw an error with the validation issues
+  if (!validationResult.success) {
+    throw new ApiError(
+      StatusCodes.UNAUTHORIZED,
+      "Validation error",
+      validationResult.error.issues.map((val) => val.message)
     );
   }
 
@@ -44,7 +58,7 @@ const userLogin = asyncHandler(async (req: Request, res: Response) => {
   const user = await User.findOne({ username });
 
   // If user is not found, throw an error
-  if (!user) throw new ApiError(StatusCodes.NOT_FOUND, "user not found");
+  if (!user) throw new ApiError(StatusCodes.UNAUTHORIZED, "user not found");
 
   // Validate password
   const isPasswordValid: boolean = await user.isPasswordValid(password);
