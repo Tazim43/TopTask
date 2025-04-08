@@ -56,7 +56,12 @@ const createTask = asyncHandler(async (req: Request, res: Response) => {
     userModel.todos.push(todo._id);
     await userModel.save();
 
-    ResponseHandler.success(res, todo);
+    ResponseHandler.success(
+      res,
+      todo,
+      "Todo created successfully",
+      StatusCodes.CREATED
+    );
   } catch (error) {
     throw new ApiError(
       StatusCodes.INTERNAL_SERVER_ERROR,
