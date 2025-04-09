@@ -4,3 +4,4 @@ export const USER_LOGIN_URL = `${BASE_URL}/auth/login`;
 export const USER_LOGOUT_URL = `${BASE_URL}/auth/logout`;
 
 export const TODO_CREATE_URL = `${BASE_URL}/todos`;
+export const TODO_UPDATE_URL = `${BASE_URL}/todos`;

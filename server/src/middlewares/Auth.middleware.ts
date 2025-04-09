@@ -26,7 +26,7 @@ const authenticate = async (
       req.cookies?.token || req.header("Authorization")?.split(" ")[1];
 
     if (!token) {
-      throw new ApiError(StatusCodes.FORBIDDEN, "No token provided");
+      throw new ApiError(StatusCodes.UNAUTHORIZED, "No token provided");
     }
 
     // Ensure JWT_SECRET is defined

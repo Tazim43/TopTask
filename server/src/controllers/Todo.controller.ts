@@ -9,6 +9,7 @@ import {
   todoValidationSchema,
   TodoValidationType,
 } from "../zod/todoValidation";
+import mongoose from "mongoose";
 
 /**
  * Handles the creation of a new task (Todo) for an authenticated user.
@@ -343,6 +344,10 @@ const updateTaskById = asyncHandler(async (req: Request, res: Response) => {
     throw new ApiError(StatusCodes.BAD_REQUEST, "Todo ID is required");
   }
 
+  if (mongoose.Types.ObjectId.isValid(id) === false) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid Todo ID format");
+  }
+
   try {
     const validationResult = todoValidationSchema.safeParse(req.body);
 
@@ -365,10 +370,7 @@ const updateTaskById = asyncHandler(async (req: Request, res: Response) => {
 
     ResponseHandler.success(res, todo);
   } catch (error) {
-    throw new ApiError(
-      StatusCodes.INTERNAL_SERVER_ERROR,
-      "Failed to update todo"
-    );
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to update todo");
   }
 });
 /**
