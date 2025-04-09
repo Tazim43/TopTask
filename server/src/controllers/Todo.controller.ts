@@ -411,10 +411,7 @@ const deleteTaskById = asyncHandler(async (req: Request, res: Response) => {
 
     ResponseHandler.success(res, { message: "Todo deleted successfully" });
   } catch (error) {
-    throw new ApiError(
-      StatusCodes.INTERNAL_SERVER_ERROR,
-      "Failed to delete todo"
-    );
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to delete todo");
   }
 });
 
